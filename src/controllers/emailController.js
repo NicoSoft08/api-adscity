@@ -558,7 +558,7 @@ const sendEmailToAdmin = async = (postData, PostID) => {
 
     const mailOptions = {
         from: `"AdsCity" <${process.env.SMTP_MAIL}>`,
-        bcc: [
+        to: [
             'admin@adscity.net',
             'n.dahpenielnicolas123@gmail.com',
             'koffigalloharistide@gmail.com',

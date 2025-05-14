@@ -174,6 +174,7 @@ const signinUser = async (userID, deviceInfo) => {
             .where("deviceInfo.browser", "==", deviceInfo.browser)
             .where("deviceInfo.os", "==", deviceInfo.os)
             .where("deviceInfo.device", "==", deviceInfo.device)
+            .where("deviceInfo.location", "==", deviceInfo.location)
             .get();
 
         let isDeviceRegistered = false;

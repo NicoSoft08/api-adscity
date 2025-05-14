@@ -92,6 +92,7 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     const { userID, deviceInfo, captchaToken } = req.body;
+    console.log(deviceInfo);
 
     if (!userID) {
         return res.status(400).json({
