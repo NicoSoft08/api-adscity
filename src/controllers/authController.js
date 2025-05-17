@@ -1,3 +1,4 @@
+const { setAuthCookie, clearCookie } = require("../config/cookies");
 const { auth } = require("../config/firebase-admin");
 const {
     createUser,
@@ -91,13 +92,26 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
+    const authHeader = req.headers.authorization || '';
+    const idToken = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
     const { userID, deviceInfo, captchaToken } = req.body;
     console.log(deviceInfo);
 
-    if (!userID) {
+
+    if (!idToken) {
         return res.status(400).json({
             success: false,
-            message: "Données incomplètes. Veuillez fournir l'identifiant.",
+            message: "Token manquant."
+        });
+    }
+
+    // Vérifier le token avec Firebase Auth
+    const decodedToken = await auth.verifyIdToken(idToken);
+
+    if (decodedToken.uid !== userID) {
+        return res.status(403).json({
+            success: false,
+            message: "UID manquant",
         });
     }
 
@@ -118,6 +132,9 @@ const loginUser = async (req, res) => {
                 message: "Échec de la vérification CAPTCHA"
             });
         }
+
+        // Créer un cookie sécurisé avec le token d'ID
+        setAuthCookie(res, idToken);
 
         const signInResult = await signinUser(userID, deviceInfo);
 
@@ -173,14 +190,28 @@ const loginAdmin = async (req, res) => {
 };
 
 const signoutUser = async (req, res) => {
+    const authHeader = req.headers.authorization || '';
+    const idToken = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
     const { userID } = req.user;
     try {
-        if (!userID) {
-            return res.status(401).json({
+        if (!idToken) {
+            return res.status(400).json({
                 success: false,
-                message: "Utilisateur non authentifié.",
+                message: "Token manquant."
             });
         }
+
+        // Vérifier le token avec Firebase Auth
+        const decodedToken = await auth.verifyIdToken(idToken);
+
+        if (decodedToken.uid !== userID) {
+            return res.status(403).json({
+                success: false,
+                message: "UID manquant",
+            });
+        }
+
+        clearCookie(res);
 
         console.log(`🟡 Tentative de déconnexion pour : ${userID}`);
 

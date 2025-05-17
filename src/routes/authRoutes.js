@@ -23,8 +23,8 @@ const router = express.Router();
 
 // Route liées à l'authentification
 router.post('/create-user', registerUser);
-router.post('/login-user', authenticateUser, loginUser);
-router.post('/logout-user', authenticateUser, signoutUser);
+router.post('/login-user', loginUser);
+router.post('/logout-user', signoutUser);
 router.delete('/delete-user', deleteUser);
 router.post('/disable-user', disableUserAccount);
 router.post('/restore-user', restoreUserAccount);

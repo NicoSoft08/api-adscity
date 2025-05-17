@@ -1,10 +1,11 @@
 const isProduction = process.env.NODE_ENV === 'production';
+console.log(process.env.NODE_ENV);
 
 const setAuthCookie = async (res, token) => {
     const cookieOptions = {
         httpOnly: true,
         secure: true,
-        sameSite: isProduction ? 'None' : 'Lax',
+        sameSite: 'None',
         path: '/',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
     };
@@ -22,7 +23,7 @@ const clearCookie = (res) => {
     const cookieOptions = {
         httpOnly: true,
         secure: true,
-        sameSite: isProduction ? 'None' : 'Lax',
+        sameSite: 'None',
         path: '/',
     };
 
