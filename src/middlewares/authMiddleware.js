@@ -208,6 +208,23 @@ const authenticateAdmin = async (req, res, next) => {
     }
 };
 
+const verifyAuthToken = async (req, res, next) => {
+    const token = req.cookies.authToken;
+
+    if (!token) {
+        return res.status(401).json({ success: false, message: 'Aucun token fourni.' });
+    }
+
+    try {
+        const decodedToken = await auth.verifyIdToken(token);
+        req.user = decodedToken;
+        next();
+    } catch (error) {
+        console.error('Erreur de vérification du token Firebase :', error);
+        res.status(401).json({ success: false, message: 'Token invalide ou expiré.' });
+    }
+}
+
 
 module.exports = {
     checkAuth,
@@ -216,5 +233,6 @@ module.exports = {
     verifyToken,
     verifyCaptcha,
     authenticateUser,
-    authenticateAdmin
+    authenticateAdmin,
+    verifyAuthToken
 };

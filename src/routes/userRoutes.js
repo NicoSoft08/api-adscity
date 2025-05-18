@@ -30,12 +30,12 @@ const {
     updateUserVerificationData,
     fetchMe
 } = require('../controllers/userController');
-const { verifyToken, authenticateAdmin, authenticateUser } = require('../middlewares/authMiddleware');
+const { verifyToken, authenticateAdmin, authenticateUser, verifyAuthToken } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
 // Route liées à l'uttilisateur
-router.get('/me', authenticateUser, fetchMe);
+router.get('/me', verifyAuthToken, fetchMe);
 router.get('/', authenticateAdmin, getUsers);
 router.get('/locations', getUserLocations);
 router.get('/all/status', getAllUsersWithStatus);

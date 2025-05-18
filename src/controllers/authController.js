@@ -92,23 +92,14 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-    const authHeader = req.headers.authorization || '';
-    const idToken = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-    const { userID, deviceInfo, captchaToken } = req.body;
+    const { token, userID, deviceInfo, captchaToken } = req.body;
     console.log(deviceInfo);
 
 
-    if (!idToken) {
-        return res.status(400).json({
-            success: false,
-            message: "Token manquant."
-        });
-    }
-
     // Vérifier le token avec Firebase Auth
-    const decodedToken = await auth.verifyIdToken(idToken);
+    const decoded = await auth.verifyIdToken(token);
 
-    if (decodedToken.uid !== userID) {
+    if (decoded.uid !== userID) {
         return res.status(403).json({
             success: false,
             message: "UID manquant",
@@ -133,8 +124,15 @@ const loginUser = async (req, res) => {
             });
         }
 
-        // Créer un cookie sécurisé avec le token d'ID
-        setAuthCookie(res, idToken);
+        // 🔐 Définir un cookie HTTP-only
+        res.cookie('authToken', token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'None',
+            domain: '.adscity.net',
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
 
         const signInResult = await signinUser(userID, deviceInfo);
 
